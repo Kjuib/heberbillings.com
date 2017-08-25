@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Heber Billings</title>
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+
+        body {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 0;
+
+            font-family: monospace, Courier;
+            font-size: 20px;
+            color: rgba(39, 255, 40, 1);
+            background: rgba(19, 18, 18, 1) url('background.png');
+            box-shadow: inset 0 0 10px 20px rgba(19, 18, 18, .5);
+        }
+
+        a,
+        input {
+            padding: 0 0 0 12px;
+            flex-grow: 1;
+
+            font-family: monospace, Courier;
+            font-size: 20px;
+            border: 0;
+            background: none;
+            outline: 0;
+            text-decoration: none;
+
+            color: rgba(39, 255, 40, 1);
+        }
+
+        a {
+            padding: 0;
+        }
+
+        .line {
+            display: flex;
+
+            white-space: nowrap;
+        }
+
+        .comp {
+            color: rgba(153, 238, 91, 1);
+        }
+
+        .path {
+            color: rgba(132, 193, 255, 1);
+        }
+
+        .actualCommand {
+            flex-grow: 1;
+        }
+
+        .currentCommand {
+            display: flex;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 10px;
+
+            white-space: nowrap;
+        }
+
+        .command {
+            margin-top: 10px;
+
+            overflow: hidden;
+        }
+
+        .history {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 30px;
+            padding: 10px;
+        }
+
+        .helpItem {
+            display: inline-block;
+            width: 50%;
+
+            cursor: pointer;
+        }
+
+        .fileItem {
+            display: inline-block;
+            width: 50%;
+
+            cursor: pointer;
+        }
+
+        .fileItem.dir {
+            color: rgba(84, 84, 255, 1);
+        }
+
+        .video > div {
+            display: inline-block;
+            width: 50%;
+            padding: 20px;
+
+            vertical-align: top;
+            box-sizing: border-box;
+        }
+
+        .video .videoMain {
+            position: relative;
+            height: 350px;
+        }
+
+        .video .videoMain iframe {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video .title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .profile-image img {
+            max-height: 400px;
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .comp .domain {
+                display: none;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .video > div {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="ng-cloak" ng-app="hbCommand" ng-controller="MainCtrl" ng-click="focusProper()">
+<div class="history">
+    <div class="command" ng-repeat="commandItem in command.list track by $index">
+        <div class="line">
+            <span class="comp">guest<span class="domain">@heberbillings.com</span></span>
+            <span class="path">&nbsp;{{commandItem.path}} $</span>
+            <span class="actualCommand">&nbsp;{{commandItem.command}}</span>
+        </div>
+        <div class="result" result-print="commandItem.result"></div>
+    </div>
+</div>
+<div class="currentCommand">
+    <span class="comp">guest<span class="domain">@heberbillings.com</span></span>
+    <span class="path">&nbsp;{{command.path}} $</span>
+    <input class="mainInput" ng-model="command.text" ng-keydown="keyPressed($event)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+</div>
+
+<a id="downloadHere" target="_blank" href="Heber_Billings_Resume_2016-09-19.pdf" download style="display: none">download</a>
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-sanitize.js"></script>
+<script>
+    var app = angular.module('hbCommand', ['ngSanitize']);
+    app.controller('MainCtrl', function ($scope, $timeout) {
+        $scope.files = [
+            {
+                type: 'file',
+                name: 'resume.pdf'
+            },
+            {
+                type: 'file',
+                name: 'contact.txt',
+                content: '<div><div>Heber Billings</div><div>385-208-7863</div><div><a href="mailto:heber.billings@gmail.com">heber.billings@gmail.com</a></div></div>'
+            },
+            {
+                type: 'file',
+                name: 'profile.jpg',
+                content: '<div class="profile-image"><img src="profile.jpg" /></div>'
+            },
+            {
+                type: 'dir',
+                name: 'projects',
+                content: [
+                    {
+                        type: 'file',
+                        name: 'brain.avi',
+                        content: '<div class="video"><div class="videoMain"><iframe src="https://www.youtube.com/embed/SlUYRnHZgfA" frameborder="0" allowfullscreen></iframe></div><div><div class="title">Dashboard - Brain</div>Dashboard for showing network and interaction information being handled in real time. Demoed at Salesforce\'s Dreamforce 2015.</div></div></div>'
+                    },
+                    {
+                        type: 'file',
+                        name: 'bubbles.avi',
+                        content: '<div class="video"><div class="videoMain"><iframe src="https://www.youtube.com/embed/bIOj4bCPHo0" frameborder="0" allowfullscreen></iframe></div><div><div class="title">Dashboard - Bubbles</div>Dashboard for showing the collection of datasources and the amount of data in them.</div></div></div>'
+                    },
+                    {
+                        type: 'file',
+                        name: 'contacting.avi',
+                        content: '<div class="video"><div class="videoMain"><iframe src="https://www.youtube.com/embed/0UKIkxrsttw" frameborder="0" allowfullscreen></iframe></div><div><div class="title">Prototype - Contacting</div>Prototype for software that helps connect and contact people. Contacting can be through email or phone call.</div></div></div>'
+                    }
+                ]
+            }
+        ];
+
+        $scope.command = {
+            text: '',
+            path: '~',
+            currentDir: $scope.files,
+            list: []
+        };
+
+        $scope.showCommands = function (commandList) {
+            var list = commandList.sort().map(function (command) {
+                return '<div class="helpItem" ng-click="typeCommand(\'' + command + '\')">' + command + '</div>';
+            });
+
+            return '<div class="helpList"><div class="helpHeader">Commands:</div>' + list.join('') + '</div>';
+        };
+
+        $scope.showFiles = function (fileList) {
+            var list = fileList.sort().map(function (file) {
+                var clickCommand = (file.type === 'file') ? 'cat' : 'cd';
+                return '<div class="fileItem ' + file.type + '" ng-click="typeCommand(\'' + clickCommand + ' ' + file.name + '\')">' + file.name + '</div>';
+            });
+
+            return '<div class="fileList"><div class="fileHeader">Files:</div>' + list.join('') + '</div>';
+
+        };
+
+        $scope.commands = {
+            help: function (historyItem) {
+                historyItem.result = $scope.showCommands(Object.keys($scope.commands));
+            },
+            clear: function () {
+                $scope.command.list = [];
+            },
+            cd: function (historyItem) {
+                var args = historyItem.command.split(' ');
+                if (args.length === 1) {
+                    $scope.command.path = '~';
+                } else {
+                    var path = ($scope.command.path + '/' + args[1]).split('/');
+                    var dir = [];
+
+                    for (var i = 0; i < path.length; i++) {
+                        var step = path[i];
+
+                        if (step === '.') {
+                            // ignore
+                        } else if (step === '~') {
+                            dir.push({name: '~', files: $scope.files});
+                        } else if (step === '..') {
+                            dir.pop();
+                            if (dir.length === 0) {
+                                historyItem.result = 'Permission denied';
+                                return;
+                            }
+                        } else {
+                            var current = dir[dir.length - 1];
+                            var newDir = current.files.find(function(file) {
+                                return file.name === step;
+                            });
+                            if (newDir && newDir.type === 'dir') {
+                                dir.push({name: newDir.name, files: newDir.content});
+                            } else {
+                                historyItem.result = 'No such directory: ' + step;
+                                return;
+                            }
+                        }
+                    }
+
+                    if (dir.length > 0 && dir[0].name === '~') {
+                        $scope.command.path = dir.reduce(function(agg, current) {
+                            if (agg.length !== 0) {
+                                agg += '/';
+                            }
+                            agg += current.name;
+                            $scope.command.currentDir = current.files;
+                            return agg;
+                        }, '');
+                    } else {
+                        historyItem.result = 'Permission denied';
+                    }
+                }
+            },
+            wget: function (historyItem) {
+                document.getElementById('downloadHere').click();
+                historyItem.result = 'downloading \'resume.pdf\'';
+            },
+            ls: function (historyItem) {
+                historyItem.result = $scope.showFiles($scope.command.currentDir);
+            },
+            cat: function (historyItem) {
+                var args = historyItem.command.split(' ');
+                if (args.length > 1) {
+                    switch (args[1]) {
+                        case 'resume.pdf': {
+                            $scope.commands.wget(historyItem);
+                            break;
+                        }
+                        default: {
+                            var foundFile = $scope.command.currentDir.filter(function (file) {
+                                return file.name === args[1];
+                            });
+
+                            if (foundFile && foundFile.length > 0) {
+                                historyItem.result = foundFile[0].content;
+                            } else {
+                                historyItem.result = 'File not found.';
+                            }
+
+                            break;
+                        }
+
+                    }
+                }
+            }
+        };
+
+        $scope.focusProper = function () {
+            document.getElementsByClassName('mainInput')[0].focus();
+        };
+        $scope.focusProper();
+
+        $scope.processCommand = function () {
+            var c = $scope.command.text.split(' ');
+            var historyItem = {
+                path: $scope.command.path,
+                command: $scope.command.text,
+                result: ''
+            };
+            $scope.command.text = '';
+
+            if (c && c.length > 0 && c[0].length > 0) {
+                var func = $scope.commands[c[0]];
+                if (func) {
+                    func(historyItem);
+                } else {
+                    historyItem.result = 'No command \'' + c[0] + '\' found.';
+                }
+            }
+            $scope.command.list.push(historyItem);
+
+            return historyItem;
+        };
+
+        $scope.cancelCommand = function () {
+            var historyItem = {
+                path: $scope.command.path,
+                command: $scope.command.text,
+                result: ''
+            };
+            $scope.command.list.push(historyItem);
+            $scope.command.text = '';
+        };
+
+        $scope.keyPressed = function ($event) {
+            $timeout.cancel($scope.autoHelp);
+
+            switch ($event.key) {
+                case 'Enter': {
+                    $scope.processCommand();
+                    break;
+                }
+                case 'c': {
+                    if ($event.ctrlKey) {
+                        $scope.cancelCommand();
+                    }
+                    break;
+                }
+                case 'Tab': {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+
+                    if ($scope.command.text.length === 0) {
+                        $scope.command.text = 'help';
+                        var historyItem = $scope.processCommand();
+                        historyItem.command = '';
+                    } else {
+                        var commands = Object.keys($scope.commands).filter(function (item) {
+                            return item.startsWith($scope.command.text);
+                        });
+                        if (commands.length === 1) {
+                            $scope.command.text = commands[0];
+                        } else {
+                            var historyItem2 = {
+                                path: $scope.command.path,
+                                command: $scope.command.text,
+                                result: $scope.showCommands(commands)
+                            };
+
+                            $scope.command.list.push(historyItem2);
+                        }
+                    }
+
+                    break;
+                }
+            }
+        };
+
+        $scope.typeCommand = function (strCommand) {
+            var type = function (str) {
+                return function () {
+                    $scope.command.text = str;
+                };
+            };
+
+            for (var i = 0; i < strCommand.length; i++) {
+                $timeout(type(strCommand.substring(0, i + 1)), i * 200);
+            }
+            $timeout(function () {
+                $scope.processCommand();
+            }, strCommand.length * 200);
+        };
+
+        $scope.autoHelp = $timeout(function () {
+            $scope.typeCommand('help');
+
+            $scope.autoHelp = $timeout(function () {
+                $scope.typeCommand('ls');
+
+                $scope.autoHelp = $timeout(function () {
+                    $scope.typeCommand('cat contact.txt');
+                }, 1500);
+
+            }, 1500);
+        }, 1500);
+
+    });
+
+    app.directive('resultPrint', function ($compile) {
+        return {
+            restrict: 'A',
+            scope: {
+                resultPrint: '='
+            },
+            link: function ($scope, $element) {
+                if ($scope.resultPrint) {
+                    var childElement = angular.element('<div>' + $scope.resultPrint + '</div>');
+                    $compile(childElement)($scope.$parent);
+                    $element.append(childElement);
+                }
+            }
+        }
+    });
+</script>
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-48099066-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</body>
+</html>
